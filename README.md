@@ -21,8 +21,12 @@ separada, pensada para ser capturada no OBS como cena de transmissão (1920×108
 
 ## Abrindo o aplicativo no Windows
 
-1. Copie `publish/win-x64/LojinhaRPG.exe` para qualquer pasta no seu PC com Windows 10/11 de 64 bits.
-   É um executável único e autocontido — **não precisa instalar .NET nem nada além do Windows**.
+1. Baixe [`dist/LojinhaRPG-win-x64.exe`](dist/LojinhaRPG-win-x64.exe) deste repositório (no GitHub,
+   abra o arquivo e clique em "Download raw file") e copie-o para qualquer pasta no seu PC com
+   Windows 10/11 de 64 bits. É um executável único e autocontido — **não precisa instalar .NET
+   nem nada além do Windows**. (Se preferir compilar você mesmo, veja
+   [Compilando a partir do código-fonte](#compilando-a-partir-do-código-fonte); o resultado sai em
+   `publish/win-x64/LojinhaRPG.exe`.)
 2. Dê duplo clique em `LojinhaRPG.exe`. O **Painel do Mestre** abre primeiro.
 3. O Windows Defender SmartScreen pode avisar "Windows protegeu seu PC" por ser um executável
    novo e sem assinatura digital paga. Clique em **Mais informações → Executar assim mesmo**.
