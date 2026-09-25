@@ -19,13 +19,10 @@
     <Image Name="BackgroundImageControl" Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080"
            Stretch="UniformToFill" Source="{Binding BackgroundImage}" IsVisible="{Binding BackgroundImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
-    <!-- vendedor -->
-    <Border Name="VendorFrame"
-            Canvas.Left="{Binding Layout.Vendor.X}" Canvas.Top="{Binding Layout.Vendor.Y}"
-            Width="{Binding Layout.Vendor.Width}" Height="{Binding Layout.Vendor.Height}"
-            Padding="8">
-      <Image Name="VendorImageControl" Source="{Binding VendorDisplayImage}" Stretch="Uniform" />
-    </Border>
+    <!-- vendedor: PNG direto sobre o fundo, sem nenhuma moldura por trás -->
+    <Image Name="VendorImageControl" Source="{Binding VendorDisplayImage}" Stretch="Uniform"
+           Canvas.Left="{Binding Layout.Vendor.X}" Canvas.Top="{Binding Layout.Vendor.Y}"
+           Width="{Binding Layout.Vendor.Width}" Height="{Binding Layout.Vendor.Height}" />
 
     <!-- painel de itens -->
     <Border Name="ItemsPanelBorder"
@@ -41,13 +38,19 @@
           </ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Button Margin="6" Click="OnItemTapped" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              <Button Margin="8" Click="OnItemTapped" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                      ToolTip.Tip="{Binding Info}">
+                      ToolTip.Tip="{Binding Info}"
+                      Background="{Binding $parent[ItemsControl].DataContext.ItemCardBackground}"
+                      BorderBrush="{Binding $parent[ItemsControl].DataContext.ItemCardBorderBrush}"
+                      BorderThickness="{Binding $parent[ItemsControl].DataContext.ItemCardBorderThickness}"
+                      CornerRadius="{Binding $parent[ItemsControl].DataContext.ItemCardCornerRadius}">
                 <Grid RowDefinitions="*,Auto">
                   <TextBlock Grid.Row="0" Text="{Binding Name}" TextWrapping="Wrap" FontSize="18" FontWeight="Bold"
+                             Foreground="{Binding $parent[ItemsControl].DataContext.ItemCardTextColor}"
                              HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" />
                   <TextBlock Grid.Row="1" Text="{Binding Price, StringFormat='{}{0} Sucata'}" FontSize="15"
+                             Foreground="{Binding $parent[ItemsControl].DataContext.ItemCardTextColor}"
                              HorizontalAlignment="Center" Margin="0,4,0,0" />
                 </Grid>
               </Button>
@@ -63,12 +66,18 @@
       </Grid>
     </Border>
 
-    <!-- legenda -->
-    <Border Canvas.Left="0" Canvas.Top="960" Width="1920" Height="120" Background="#CC000000"
-            IsVisible="{Binding CaptionVisible}">
-      <TextBlock Text="{Binding CaptionText}" Foreground="White" FontSize="26" TextWrapping="Wrap"
-                 HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" TextAlignment="Center" />
-    </Border>
+    <!-- legenda: balão de fala estilo mangá, ancorado perto do vendedor -->
+    <Grid Name="CaptionBubbleRoot" Width="620" IsVisible="{Binding CaptionVisible}">
+      <Border Name="BubbleBody" Background="#F5EFE0" BorderBrush="#2B1B0E" BorderThickness="4" CornerRadius="28"
+              Padding="28,22" MinHeight="110">
+        <TextBlock Text="{Binding CaptionText}" Foreground="#2B1B0E" FontSize="24" FontWeight="Bold"
+                   TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <Polygon Name="TailDown" Points="0,0 50,0 12,48" Fill="#F5EFE0" Stroke="#2B1B0E" StrokeThickness="4"
+               StrokeJoin="Round" HorizontalAlignment="Left" Margin="70,0,0,-44" VerticalAlignment="Bottom" />
+      <Polygon Name="TailUp" Points="0,48 50,48 12,0" Fill="#F5EFE0" Stroke="#2B1B0E" StrokeThickness="4"
+               StrokeJoin="Round" HorizontalAlignment="Left" Margin="70,-44,0,0" VerticalAlignment="Top" />
+    </Grid>
 
     <!-- indicador de gasto -->
     <Border Canvas.Left="1620" Canvas.Top="30" Width="270" Height="60" Background="#DDB02020" CornerRadius="8"

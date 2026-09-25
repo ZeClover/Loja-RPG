@@ -31,6 +31,14 @@ public class ShopPreset
 
     public string FontFamily { get; set; } = "Georgia";
 
+    /// <summary>
+    /// Textura opcional (imagem) usada como fundo de cada moldura de item, no lugar da cor lisa
+    /// de <see cref="ItemsPanelBackground"/>. Caminho relativo dentro da pasta "media" do preset.
+    /// </summary>
+    public string FrameTextureFile { get; set; } = string.Empty;
+
+    public bool HasFrameTexture => !string.IsNullOrWhiteSpace(FrameTextureFile);
+
     public static ShopPreset CreateFeiraPreset() => new()
     {
         Name = "Loja de feira",

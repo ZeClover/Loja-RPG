@@ -1,3 +1,4 @@
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LojinhaRPG.Core.Models;
@@ -24,6 +25,11 @@ public partial class PresetEditDialogViewModel : ViewModelBase
     public string[] TextureStyles { get; } = { "Flat", "Wood", "Cloth", "Moss", "Stone" };
     [ObservableProperty] private string _selectedTextureStyle;
 
+    [ObservableProperty] private Bitmap? _frameTexturePreview;
+    [ObservableProperty] private string _frameTextureLabel = "(nenhuma textura)";
+
+    public string RecommendedFrameTextureSize { get; } = ItemGridMetrics.DescribeRecommendedFrameTextureSize();
+
     public bool Confirmed { get; private set; }
     public Action? RequestClose { get; set; }
 
@@ -42,6 +48,28 @@ public partial class PresetEditDialogViewModel : ViewModelBase
         _textColor = source.TextColor;
         _itemsPanelBackground = source.ItemsPanelBackground;
         _selectedTextureStyle = source.TextureStyle;
+
+        LoadFrameTexturePreview();
+    }
+
+    private void LoadFrameTexturePreview()
+    {
+        var path = AppServices.Presets.ResolveMediaPath(Working.Id, Working.FrameTextureFile);
+        FrameTextureLabel = path is null ? "(nenhuma textura)" : Working.FrameTextureFile;
+        try { FrameTexturePreview = path is null ? null : new Bitmap(path); }
+        catch { FrameTexturePreview = null; }
+    }
+
+    public void ImportFrameTexture(string sourcePath)
+    {
+        Working.FrameTextureFile = AppServices.Presets.ImportMediaFile(Working.Id, sourcePath, "frame");
+        LoadFrameTexturePreview();
+    }
+
+    public void ClearFrameTexture()
+    {
+        Working.FrameTextureFile = string.Empty;
+        LoadFrameTexturePreview();
     }
 
     [RelayCommand]

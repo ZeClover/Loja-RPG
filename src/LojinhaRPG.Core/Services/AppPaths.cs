@@ -25,7 +25,10 @@ public static class AppPaths
     public static string SetDir(Guid setId) => EnsureDir(Path.Combine(SetsDir, setId.ToString()));
     public static string SetMediaDir(Guid setId) => EnsureDir(Path.Combine(SetDir(setId), "media"));
     public static string SetJsonPath(Guid setId) => Path.Combine(SetDir(setId), "set.json");
-    public static string PresetJsonPath(Guid presetId) => Path.Combine(PresetsDir, presetId + ".json");
+
+    public static string PresetDir(Guid presetId) => EnsureDir(Path.Combine(PresetsDir, presetId.ToString()));
+    public static string PresetMediaDir(Guid presetId) => EnsureDir(Path.Combine(PresetDir(presetId), "media"));
+    public static string PresetJsonPath(Guid presetId) => Path.Combine(PresetDir(presetId), "preset.json");
 
     private static string EnsureDir(string path)
     {

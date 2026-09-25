@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using LojinhaRPG.App.ViewModels;
 using LojinhaRPG.Core.Models;
 
@@ -6,6 +8,8 @@ namespace LojinhaRPG.App.Views.Controls;
 
 public partial class PresetEditDialog : Window
 {
+    private PresetEditDialogViewModel Vm => (PresetEditDialogViewModel)DataContext!;
+
     public PresetEditDialog()
     {
         InitializeComponent();
@@ -20,4 +24,18 @@ public partial class PresetEditDialog : Window
         await dialog.ShowDialog(owner);
         return vm.Confirmed;
     }
+
+    private async void OnPickFrameTexture(object? sender, RoutedEventArgs e)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Escolher textura de moldura",
+            AllowMultiple = false,
+            FileTypeFilter = new[] { FilePickerFileTypes.ImageAll },
+        });
+        var file = files.FirstOrDefault();
+        if (file is not null) Vm.ImportFrameTexture(file.Path.LocalPath);
+    }
+
+    private void OnClearFrameTexture(object? sender, RoutedEventArgs e) => Vm.ClearFrameTexture();
 }

@@ -60,17 +60,22 @@ os dados salvos, a pasta `%AppData%\LojinhaRPG\`.
 - Aba **Dados**: nome da loja, nome do vendedor e as 4 imagens (vendedor, reação, despedida, fundo).
 - Aba **Itens**: adicionar/editar/remover itens e **repor estoque** manualmente.
 - Aba **Falas**: legenda de texto e/ou áudio para chegada, venda e saída.
-- Aba **Visual**: escolher/editar/criar presets visuais e arrastar a posição/tamanho do vendedor
-  e da grade de itens numa prévia da cena (também dá para digitar os valores em pixels).
+- Aba **Visual**: a prévia já mostra o resultado final (fundo real, vendedor sem moldura e a
+  grade de itens já estilizada). Escolha/edite/crie presets visuais e arraste a posição/tamanho
+  do vendedor e da grade de itens (também dá para digitar os valores em pixels). Um preset pode
+  ter uma textura de imagem para a moldura de cada item, além das cores.
 - **Abrir loja** / **Sair da loja**: controla a sessão ao vivo.
 
 **Janela da Loja (visão dos jogadores / OBS)**
 
-- Grade 3×3 (9 itens por página), com paginação quando há mais itens.
+- O vendedor aparece como uma imagem solta sobre o fundo, sem nenhuma moldura atrás.
+- Grade 3×3 (9 itens por página), cada item na sua própria moldura (cor ou textura do preset),
+  com paginação quando há mais itens.
 - Passar o mouse sobre um item mostra as informações adicionais.
 - Clicar em um item abre estoque disponível, controle de quantidade e confirmação de compra.
 - Após confirmar, aparece por ~2s um indicador vermelho ("− X Sucata"), toca a imagem de reação
   e a fala de venda (se cadastradas), e o estoque é descontado e salvo imediatamente.
+- Falas com legenda aparecem como um balão de fala estilo mangá, ancorado perto do vendedor.
 
 ## Estrutura do projeto
 

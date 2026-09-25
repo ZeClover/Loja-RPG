@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using LojinhaRPG.Core.Models;
 
 namespace LojinhaRPG.App.Views.Controls;
@@ -8,6 +10,8 @@ namespace LojinhaRPG.App.Views.Controls;
 /// <summary>
 /// Prévia arrastável/redimensionável da cena de 1920x1080: permite posicionar as áreas do
 /// vendedor e da grade de itens, mantendo os valores sincronizados com o RegionLayout do set.
+/// Também renderiza uma prévia do resultado final (fundo, vendedor sem moldura e grade de itens
+/// já estilizada com o preset), para o usuário ver como a loja vai ficar antes de abri-la.
 /// </summary>
 public partial class VisualEditorControl : UserControl
 {
@@ -20,12 +24,28 @@ public partial class VisualEditorControl : UserControl
     private Point _pointerStart;
     private double _startX, _startY, _startW, _startH;
 
+    private readonly Border[] _itemPreviewCards = new Border[9];
+
     public event Action? LayoutEdited;
     public event Action? DragCompleted;
 
     public VisualEditorControl()
     {
         InitializeComponent();
+
+        for (var i = 0; i < _itemPreviewCards.Length; i++)
+        {
+            var card = new Border
+            {
+                Margin = new Thickness(3),
+                BorderThickness = new Thickness(2),
+                CornerRadius = new CornerRadius(4),
+                Background = new SolidColorBrush(Color.Parse("#4A2F20")),
+                BorderBrush = new SolidColorBrush(Color.Parse("#2A1810")),
+            };
+            _itemPreviewCards[i] = card;
+            ItemsPreviewGrid.Children.Add(card);
+        }
 
         VendorHandle.PointerPressed += (s, e) => BeginDrag(DragMode.MoveVendor, e);
         VendorGrip.PointerPressed += (s, e) => { BeginDrag(DragMode.ResizeVendor, e); e.Handled = true; };
@@ -51,14 +71,45 @@ public partial class VisualEditorControl : UserControl
         Redraw();
     }
 
+    /// <summary>Atualiza a prévia visual: fundo, imagem do vendedor e o estilo das molduras de item.</summary>
+    public void SetPreview(Bitmap? background, Bitmap? vendorImage, ShopPreset preset, Bitmap? frameTexture)
+    {
+        PreviewBackgroundImage.Source = background;
+        VendorPreviewImage.Source = vendorImage;
+
+        IBrush cardBackground = frameTexture is not null
+            ? new ImageBrush(frameTexture) { Stretch = Stretch.UniformToFill }
+            : new SolidColorBrush(ParseColor(preset.ItemsPanelBackground));
+        var cardBorder = new SolidColorBrush(ParseColor(preset.BorderColor));
+        var cardRadius = new CornerRadius(Math.Max(0, preset.CornerRadius - 2));
+        var cardThickness = new Thickness(Math.Max(2, preset.BorderThickness / 2));
+
+        foreach (var card in _itemPreviewCards)
+        {
+            card.Background = cardBackground;
+            card.BorderBrush = cardBorder;
+            card.CornerRadius = cardRadius;
+            card.BorderThickness = cardThickness;
+        }
+    }
+
+    private static Color ParseColor(string hex)
+    {
+        try { return Color.Parse(hex); } catch { return Colors.Gray; }
+    }
+
     private void OnRegionPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Redraw();
 
     private double Scale => EditorCanvas.Bounds.Width > 0 ? EditorCanvas.Bounds.Width / VisualLayout.SceneWidth : 0.25;
 
     private void Redraw()
     {
-        if (_vendor is null || _items is null) return;
         var scale = Scale;
+
+        PreviewBackgroundImage.Width = VisualLayout.SceneWidth * scale;
+        PreviewBackgroundImage.Height = VisualLayout.SceneHeight * scale;
+
+        if (_vendor is null || _items is null) return;
 
         Canvas.SetLeft(VendorHandle, _vendor.X * scale);
         Canvas.SetTop(VendorHandle, _vendor.Y * scale);

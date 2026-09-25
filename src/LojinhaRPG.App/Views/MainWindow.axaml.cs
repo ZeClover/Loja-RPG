@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using LojinhaRPG.App.ViewModels;
 using LojinhaRPG.App.Views.Controls;
@@ -12,6 +13,7 @@ public partial class MainWindow : Window
     private MainWindowViewModel Vm => (MainWindowViewModel)DataContext!;
     private ShopWindow? _shopWindow;
     private bool _suppressRegionBoxEvents;
+    private SetEditorViewModel? _subscribedEditor;
 
     public MainWindow()
     {
@@ -39,11 +41,47 @@ public partial class MainWindow : Window
 
     private void OnEditorChanged()
     {
+        if (_subscribedEditor is not null) _subscribedEditor.PropertyChanged -= OnEditorPropertyChangedForPreview;
+
         var editor = Vm.Editor;
+        _subscribedEditor = editor;
         if (editor is null) return;
+
+        editor.PropertyChanged += OnEditorPropertyChangedForPreview;
 
         VisualEditor.SetRegions(editor.Layout.Vendor, editor.Layout.ItemsPanel);
         SyncRegionBoxesFromModel();
+        RefreshVisualPreview();
+    }
+
+    private void OnEditorPropertyChangedForPreview(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(SetEditorViewModel.VendorImage) or nameof(SetEditorViewModel.BackgroundImage)
+            or nameof(SetEditorViewModel.SelectedPreset))
+        {
+            RefreshVisualPreview();
+        }
+    }
+
+    /// <summary>Atualiza a prévia do "resultado final" na aba Visual: fundo, vendedor sem
+    /// moldura e a grade de itens já estilizada com o preset selecionado.</summary>
+    private void RefreshVisualPreview()
+    {
+        var editor = Vm.Editor;
+        if (editor is null) return;
+
+        var preset = editor.SelectedPreset ?? editor.Presets.FirstOrDefault();
+        Bitmap? frameTexture = null;
+        if (preset is not null && preset.HasFrameTexture)
+        {
+            var path = AppServices.Presets.ResolveMediaPath(preset.Id, preset.FrameTextureFile);
+            if (path is not null)
+            {
+                try { frameTexture = new Bitmap(path); } catch { frameTexture = null; }
+            }
+        }
+
+        VisualEditor.SetPreview(editor.BackgroundImage, editor.VendorImage, preset ?? new ShopPreset(), frameTexture);
     }
 
     private void SyncRegionBoxesFromModel()
@@ -324,11 +362,16 @@ public partial class MainWindow : Window
     private async void OnImportPreset(object? sender, RoutedEventArgs e)
     {
         if (Vm.Editor is null) return;
+
+        await InfoDialog.ShowAsync(this, "Importar preset visual",
+            "O preset é um arquivo .zip com as cores e, se houver, a textura de moldura de item.\n\n" +
+            ItemGridMetrics.DescribeRecommendedFrameTextureSize());
+
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Importar preset visual (.json)",
+            Title = "Importar preset visual (.zip)",
             AllowMultiple = false,
-            FileTypeFilter = new[] { new FilePickerFileType("Preset visual (*.json)") { Patterns = new[] { "*.json" } } },
+            FileTypeFilter = new[] { new FilePickerFileType("Preset visual (*.zip)") { Patterns = new[] { "*.zip" } } },
         });
         var file = files.FirstOrDefault();
         if (file is null) return;
@@ -349,12 +392,12 @@ public partial class MainWindow : Window
     private async void OnExportPreset(object? sender, RoutedEventArgs e)
     {
         if (Vm.Editor?.SelectedPreset is null) return;
-        var suggestedName = SanitizeFileName(Vm.Editor.SelectedPreset.Name) + ".json";
+        var suggestedName = SanitizeFileName(Vm.Editor.SelectedPreset.Name) + ".zip";
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Exportar preset visual",
             SuggestedFileName = suggestedName,
-            FileTypeChoices = new[] { new FilePickerFileType("Preset visual (*.json)") { Patterns = new[] { "*.json" } } },
+            FileTypeChoices = new[] { new FilePickerFileType("Preset visual (*.zip)") { Patterns = new[] { "*.zip" } } },
         });
         if (file is null) return;
 

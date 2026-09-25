@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -28,6 +29,13 @@ public partial class ShopWindowViewModel : ViewModelBase
     [ObservableProperty] private Bitmap? _vendorDisplayImage;
     [ObservableProperty] private Bitmap? _backgroundImage;
     [ObservableProperty] private ShopPreset _preset;
+
+    /// <summary>Fundo de cada moldura de item: a textura do preset, se houver, senão a cor lisa configurada.</summary>
+    [ObservableProperty] private IBrush _itemCardBackground = Brushes.SaddleBrown;
+    [ObservableProperty] private IBrush _itemCardBorderBrush = Brushes.Black;
+    [ObservableProperty] private double _itemCardBorderThickness = 2;
+    [ObservableProperty] private double _itemCardCornerRadius = 8;
+    [ObservableProperty] private IBrush _itemCardTextColor = Brushes.White;
 
     public VisualLayout Layout => Set.Layout;
 
@@ -60,12 +68,49 @@ public partial class ShopWindowViewModel : ViewModelBase
         _preset = ResolvePreset(set);
         RefreshVendorAndBackground();
         RefreshPage();
+        ApplyItemCardStyle();
     }
 
     private static ShopPreset ResolvePreset(ShopSet set)
     {
         var fromSet = set.PresetId != Guid.Empty ? AppServices.Presets.Load(set.PresetId) : null;
         return fromSet ?? AppServices.Presets.LoadAll().FirstOrDefault() ?? ShopPreset.CreateFeiraPreset();
+    }
+
+    partial void OnPresetChanged(ShopPreset value) => ApplyItemCardStyle();
+
+    /// <summary>Calcula o visual de cada quadro de item a partir do preset: usa a textura de
+    /// moldura como imagem de fundo se o preset tiver uma, senão usa a cor lisa configurada.</summary>
+    private void ApplyItemCardStyle()
+    {
+        var preset = Preset;
+        var texturePath = AppServices.Presets.ResolveMediaPath(preset.Id, preset.FrameTextureFile);
+
+        if (texturePath is not null)
+        {
+            try
+            {
+                ItemCardBackground = new ImageBrush(new Bitmap(texturePath)) { Stretch = Stretch.UniformToFill };
+            }
+            catch
+            {
+                ItemCardBackground = new SolidColorBrush(ParseColor(preset.ItemsPanelBackground));
+            }
+        }
+        else
+        {
+            ItemCardBackground = new SolidColorBrush(ParseColor(preset.ItemsPanelBackground));
+        }
+
+        ItemCardBorderBrush = new SolidColorBrush(ParseColor(preset.BorderColor));
+        ItemCardBorderThickness = Math.Max(2, preset.BorderThickness / 2);
+        ItemCardCornerRadius = Math.Max(0, preset.CornerRadius - 2);
+        ItemCardTextColor = new SolidColorBrush(ParseColor(preset.TextColor));
+    }
+
+    private static Color ParseColor(string hex)
+    {
+        try { return Color.Parse(hex); } catch { return Colors.Gray; }
     }
 
     private Bitmap? LoadBitmap(string relativeFile)

@@ -49,6 +49,7 @@ public partial class ShopWindow : Window
         };
 
         ApplyPresetStyle();
+        PositionCaptionBubble();
 
         Closing += (_, _) =>
         {
@@ -69,26 +70,12 @@ public partial class ShopWindow : Window
     {
         var preset = Vm.Preset;
 
-        var panelBrush = new LinearGradientBrush
-        {
-            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
-            GradientStops =
-            {
-                new GradientStop(ParseColor(preset.PanelBackground), 0),
-                new GradientStop(ParseColor(preset.PanelBackgroundSecondary), 1),
-            },
-        };
         var itemsBrush = new SolidColorBrush(ParseColor(preset.ItemsPanelBackground));
         var borderBrush = new SolidColorBrush(ParseColor(preset.BorderColor));
         var thickness = new Thickness(preset.BorderThickness);
         var radius = new CornerRadius(preset.CornerRadius);
 
-        VendorFrame.Background = panelBrush;
-        VendorFrame.BorderBrush = borderBrush;
-        VendorFrame.BorderThickness = thickness;
-        VendorFrame.CornerRadius = radius;
-
+        // Não há moldura atrás do vendedor de propósito: o PNG fica solto sobre o Background da cena.
         ItemsPanelBorder.Background = itemsBrush;
         ItemsPanelBorder.BorderBrush = borderBrush;
         ItemsPanelBorder.BorderThickness = thickness;
@@ -98,6 +85,29 @@ public partial class ShopWindow : Window
     private static Color ParseColor(string hex)
     {
         try { return Color.Parse(hex); } catch { return Colors.Gray; }
+    }
+
+    /// <summary>Posiciona o balão de fala perto do vendedor, com o rabicho apontando para ele.
+    /// Fica acima quando há espaço; senão, logo abaixo do topo do vendedor.</summary>
+    private void PositionCaptionBubble()
+    {
+        const double bubbleWidth = 620;
+        const double estimatedBubbleHeight = 190; // corpo + rabicho, para decidir/posicionar antes do layout medir o texto
+        const double margin = 20;
+
+        var vendor = Vm.Layout.Vendor;
+        var desiredLeft = vendor.X + vendor.Width / 2 - bubbleWidth / 2;
+        var left = Math.Clamp(desiredLeft, margin, 1920 - bubbleWidth - margin);
+
+        bool placeAbove = vendor.Y - estimatedBubbleHeight - margin > 0;
+        double top = placeAbove
+            ? Math.Max(margin, vendor.Y - estimatedBubbleHeight)
+            : Math.Min(1080 - estimatedBubbleHeight - margin, vendor.Y + 24);
+
+        Canvas.SetLeft(CaptionBubbleRoot, left);
+        Canvas.SetTop(CaptionBubbleRoot, top);
+        TailDown.IsVisible = placeAbove;
+        TailUp.IsVisible = !placeAbove;
     }
 
     private void OnItemTapped(object? sender, RoutedEventArgs e)

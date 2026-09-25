@@ -1,23 +1,37 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LojinhaRPG.App.Views.Controls.VisualEditorControl">
-  <Border Background="#1A1A1A" BorderBrush="#444" BorderThickness="1" CornerRadius="4">
+  <Border Background="#101010" BorderBrush="#444" BorderThickness="1" CornerRadius="4">
     <Canvas x:Name="EditorCanvas" ClipToBounds="True" Background="Transparent">
+
+      <!-- prévia do resultado final: fundo real da cena -->
+      <Image x:Name="PreviewBackgroundImage" Canvas.Left="0" Canvas.Top="0" Stretch="Fill" IsHitTestVisible="False" />
+
+      <!-- vendedor: sem moldura, igual à Janela da Loja -->
       <Border x:Name="VendorHandle"
-              Background="#665BAF6B" BorderBrush="#8BE28B" BorderThickness="2"
+              Background="Transparent" BorderBrush="#8BE28B" BorderThickness="2"
               Cursor="SizeAll">
         <Grid>
-          <TextBlock Text="Vendedor" Foreground="White" FontSize="11" Margin="4" />
+          <Image x:Name="VendorPreviewImage" Stretch="Uniform" IsHitTestVisible="False" />
+          <Border Background="#AA000000" CornerRadius="3" Padding="4,2"
+                  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2">
+            <TextBlock Text="Vendedor" Foreground="#8BE28B" FontSize="11" />
+          </Border>
           <Border x:Name="VendorGrip" Width="16" Height="16" Background="#8BE28B"
                   HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" />
         </Grid>
       </Border>
 
+      <!-- grade de itens: prévia já estilizada com as molduras do preset -->
       <Border x:Name="ItemsHandle"
-              Background="#66C99A3E" BorderBrush="#F0B23D" BorderThickness="2"
+              Background="#33000000" BorderBrush="#F0B23D" BorderThickness="2"
               Cursor="SizeAll">
         <Grid>
-          <TextBlock Text="Itens" Foreground="White" FontSize="11" Margin="4" />
+          <UniformGrid x:Name="ItemsPreviewGrid" Rows="3" Columns="3" Margin="6" IsHitTestVisible="False" />
+          <Border Background="#AA000000" CornerRadius="3" Padding="4,2"
+                  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2">
+            <TextBlock Text="Itens" Foreground="#F0B23D" FontSize="11" />
+          </Border>
           <Border x:Name="ItemsGrip" Width="16" Height="16" Background="#F0B23D"
                   HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" />
         </Grid>

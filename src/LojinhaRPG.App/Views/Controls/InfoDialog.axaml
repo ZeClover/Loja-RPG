@@ -1,0 +1,10 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LojinhaRPG.App.Views.Controls.InfoDialog"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <StackPanel Margin="20" Spacing="16">
+    <TextBlock Name="MessageText" TextWrapping="Wrap" />
+    <Button Name="OkButton" Content="Entendi" HorizontalAlignment="Right" Click="OnOkClicked" Classes="accent" />
+  </StackPanel>
+</Window>
