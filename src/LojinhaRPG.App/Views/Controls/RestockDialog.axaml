@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:LojinhaRPG.App.ViewModels"
+        x:Class="LojinhaRPG.App.Views.Controls.RestockDialog"
+        x:DataType="vm:RestockDialogViewModel"
+        Width="360" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Repor estoque">
+  <StackPanel Margin="20" Spacing="10">
+    <TextBlock Text="{Binding ItemName}" FontWeight="Bold" FontSize="16" />
+    <TextBlock>
+      <Run Text="Estoque atual: " /><Run Text="{Binding CurrentStock}" />
+    </TextBlock>
+
+    <TextBlock Text="Unidades a adicionar" Margin="0,10,0,0" />
+    <NumericUpDown Value="{Binding AmountToAdd}" Minimum="1" Increment="1" FormatString="0" />
+
+    <TextBlock Text="{Binding ErrorMessage}" Foreground="IndianRed" TextWrapping="Wrap" />
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+      <Button Content="Cancelar" Command="{Binding CancelCommand}" />
+      <Button Content="Adicionar" Command="{Binding ConfirmCommand}" Classes="accent" />
+    </StackPanel>
+  </StackPanel>
+</Window>

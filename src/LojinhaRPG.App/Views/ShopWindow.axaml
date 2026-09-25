@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LojinhaRPG.App.Views.ShopWindow"
+        Title="Lojinha RPG — Loja"
+        Width="1920" Height="1080"
+        CanResize="False"
+        SystemDecorations="None"
+        WindowStartupLocation="Manual"
+        Background="Black">
+
+  <Canvas Width="1920" Height="1080" ClipToBounds="True" PointerPressed="OnBackgroundPointerPressed" PointerMoved="OnBackgroundPointerMoved" PointerReleased="OnBackgroundPointerReleased">
+
+    <!-- fundo -->
+    <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080">
+      <Border.Background>
+        <SolidColorBrush Color="#101010" />
+      </Border.Background>
+    </Border>
+    <Image Name="BackgroundImageControl" Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080"
+           Stretch="UniformToFill" Source="{Binding BackgroundImage}" IsVisible="{Binding BackgroundImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+    <!-- vendedor -->
+    <Border Name="VendorFrame"
+            Canvas.Left="{Binding Layout.Vendor.X}" Canvas.Top="{Binding Layout.Vendor.Y}"
+            Width="{Binding Layout.Vendor.Width}" Height="{Binding Layout.Vendor.Height}"
+            Padding="8">
+      <Image Name="VendorImageControl" Source="{Binding VendorDisplayImage}" Stretch="Uniform" />
+    </Border>
+
+    <!-- painel de itens -->
+    <Border Name="ItemsPanelBorder"
+            Canvas.Left="{Binding Layout.ItemsPanel.X}" Canvas.Top="{Binding Layout.ItemsPanel.Y}"
+            Width="{Binding Layout.ItemsPanel.Width}" Height="{Binding Layout.ItemsPanel.Height}"
+            Padding="16">
+      <Grid RowDefinitions="*,Auto">
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding CurrentPageItems}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Rows="3" Columns="3" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Margin="6" Click="OnItemTapped" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                      ToolTip.Tip="{Binding Info}">
+                <Grid RowDefinitions="*,Auto">
+                  <TextBlock Grid.Row="0" Text="{Binding Name}" TextWrapping="Wrap" FontSize="18" FontWeight="Bold"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" />
+                  <TextBlock Grid.Row="1" Text="{Binding Price, StringFormat='{}{0} Sucata'}" FontSize="15"
+                             HorizontalAlignment="Center" Margin="0,4,0,0" />
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+          <Button Grid.Column="0" Content="◀" Command="{Binding PrevPageCommand}" />
+          <TextBlock Grid.Column="1" Text="{Binding PageLabel}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+          <Button Grid.Column="2" Content="▶" Command="{Binding NextPageCommand}" />
+        </Grid>
+      </Grid>
+    </Border>
+
+    <!-- legenda -->
+    <Border Canvas.Left="0" Canvas.Top="960" Width="1920" Height="120" Background="#CC000000"
+            IsVisible="{Binding CaptionVisible}">
+      <TextBlock Text="{Binding CaptionText}" Foreground="White" FontSize="26" TextWrapping="Wrap"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" TextAlignment="Center" />
+    </Border>
+
+    <!-- indicador de gasto -->
+    <Border Canvas.Left="1620" Canvas.Top="30" Width="270" Height="60" Background="#DDB02020" CornerRadius="8"
+            IsVisible="{Binding IndicatorVisible}">
+      <TextBlock Text="{Binding IndicatorText}" Foreground="White" FontSize="24" FontWeight="Bold"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Border>
+
+    <!-- overlay de detalhes / compra -->
+    <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080" Background="#AA000000"
+            IsVisible="{Binding DetailOverlayVisible}">
+      <Border Width="560" Height="420" Background="#222" CornerRadius="12" BorderBrush="#555" BorderThickness="2"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="26">
+          <TextBlock Grid.Row="0" Text="{Binding SelectedItem.Name}" FontSize="28" FontWeight="Bold" Foreground="White" />
+          <TextBlock Grid.Row="1" Text="{Binding SelectedItem.Info}" FontSize="16" Foreground="#CCCCCC" TextWrapping="Wrap" Margin="0,10,0,0" />
+          <TextBlock Grid.Row="2" Foreground="#DDDDDD" FontSize="18" Margin="0,14,0,0">
+            <Run Text="Preço unitário: " /><Run Text="{Binding SelectedItem.Price}" /><Run Text=" Sucata" />
+            <LineBreak />
+            <Run Text="Estoque disponível: " /><Run Text="{Binding SelectedItem.Stock}" />
+          </TextBlock>
+
+          <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="14" Margin="0,10,0,0">
+            <Button Content="−" Width="46" Height="46" FontSize="22" Command="{Binding DecreaseQtyCommand}" />
+            <TextBlock Text="{Binding PurchaseQuantity}" FontSize="26" Width="70" TextAlignment="Center" VerticalAlignment="Center" Foreground="White" />
+            <Button Content="+" Width="46" Height="46" FontSize="22" Command="{Binding IncreaseQtyCommand}" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="5" Spacing="8" Margin="0,16,0,0">
+            <TextBlock Text="{Binding PurchaseTotal, StringFormat='Total: {0} Sucata'}" FontSize="18" Foreground="#F0B23D" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding PurchaseError}" Foreground="IndianRed" HorizontalAlignment="Center" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="14">
+              <Button Content="Cancelar" Command="{Binding CloseDetailCommand}" Padding="20,10" />
+              <Button Content="Confirmar compra" Command="{Binding ConfirmPurchaseCommand}" Padding="20,10" Background="#3E8E41" Foreground="White" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Border>
+
+  </Canvas>
+</Window>

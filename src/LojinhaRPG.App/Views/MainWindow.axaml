@@ -1,0 +1,248 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vc="using:LojinhaRPG.App.Views.Controls"
+        x:Class="LojinhaRPG.App.Views.MainWindow"
+        Title="Lojinha RPG — Painel do Mestre"
+        Width="1360" Height="860" MinWidth="1100" MinHeight="700"
+        WindowStartupLocation="CenterScreen">
+
+  <Grid ColumnDefinitions="280,*" Margin="10">
+
+    <!-- ===================== BIBLIOTECA (esquerda) ===================== -->
+    <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Margin="0,0,10,0">
+      <TextBlock Grid.Row="0" Text="Biblioteca de lojas" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
+
+      <ListBox Grid.Row="1" ItemsSource="{Binding Library}" SelectedItem="{Binding SelectedSetSummary}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel>
+              <TextBlock Text="{Binding ShopName}" FontWeight="Bold" />
+              <TextBlock Text="{Binding VendorName}" FontSize="11" Opacity="0.7" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <StackPanel Grid.Row="2" Spacing="6" Margin="0,8,0,0">
+        <Button Content="+ Nova loja" Command="{Binding NewSetCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Grid ColumnDefinitions="*,*" >
+          <Button Grid.Column="0" Content="Duplicar" Command="{Binding DuplicateSetCommand}" Margin="0,0,3,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          <Button Grid.Column="1" Name="DeleteButton" Content="Excluir" Margin="3,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnDeleteClicked" />
+        </Grid>
+        <Grid ColumnDefinitions="*,*">
+          <Button Grid.Column="0" Name="ImportButton" Content="Importar..." Margin="0,0,3,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnImportClicked" />
+          <Button Grid.Column="1" Name="ExportButton" Content="Exportar..." Margin="3,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnExportClicked" />
+        </Grid>
+      </StackPanel>
+    </Grid>
+
+    <!-- ===================== EDITOR (direita) ===================== -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" IsVisible="{Binding Editor, Converter={x:Static ObjectConverters.IsNotNull}}">
+
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+        <TextBox Grid.Column="0" Text="{Binding Editor.ShopName}" FontSize="20" Watermark="Nome da loja" />
+        <Button Grid.Column="1" Content="Abrir loja" Command="{Binding OpenShopCommand}" Margin="8,0,0,0" Classes="accent" />
+        <Button Grid.Column="2" Content="Sair da loja" Command="{Binding CloseShopCommand}" Margin="8,0,0,0" />
+      </Grid>
+
+      <TabControl Grid.Row="1">
+
+        <!-- DADOS -->
+        <TabItem Header="Dados">
+          <ScrollViewer>
+            <StackPanel Spacing="10" Margin="4">
+              <TextBlock Text="Nome do vendedor" />
+              <TextBox Text="{Binding Editor.VendorName}" />
+
+              <Separator Margin="0,6" />
+
+              <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                  <TextBlock Text="Imagem principal do vendedor (obrigatória)" FontWeight="Bold" />
+                  <Border Height="150" Background="#222" CornerRadius="4">
+                    <Image Source="{Binding Editor.VendorImage}" Stretch="Uniform" />
+                  </Border>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Name="PickVendorImageButton" Content="Escolher imagem..." Click="OnPickVendorImage" />
+                  </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                  <TextBlock Text="Imagem de reação após venda (opcional)" FontWeight="Bold" />
+                  <Border Height="150" Background="#222" CornerRadius="4">
+                    <Image Source="{Binding Editor.ReactionImage}" Stretch="Uniform" />
+                  </Border>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Name="PickReactionImageButton" Content="Escolher..." Click="OnPickReactionImage" />
+                    <Button Name="ClearReactionImageButton" Content="Remover" Click="OnClearReactionImage" />
+                  </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4" Margin="0,10,6,0">
+                  <TextBlock Text="Imagem de despedida (opcional)" FontWeight="Bold" />
+                  <Border Height="150" Background="#222" CornerRadius="4">
+                    <Image Source="{Binding Editor.FarewellImage}" Stretch="Uniform" />
+                  </Border>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Name="PickFarewellImageButton" Content="Escolher..." Click="OnPickFarewellImage" />
+                    <Button Name="ClearFarewellImageButton" Content="Remover" Click="OnClearFarewellImage" />
+                  </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4" Margin="6,10,0,0">
+                  <TextBlock Text="Imagem de fundo/ambiente (opcional)" FontWeight="Bold" />
+                  <Border Height="150" Background="#222" CornerRadius="4">
+                    <Image Source="{Binding Editor.BackgroundImage}" Stretch="Uniform" />
+                  </Border>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Name="PickBackgroundImageButton" Content="Escolher..." Click="OnPickBackgroundImage" />
+                    <Button Name="ClearBackgroundImageButton" Content="Remover" Click="OnClearBackgroundImage" />
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <!-- ITENS -->
+        <TabItem Header="Itens">
+          <Grid RowDefinitions="Auto,*" Margin="4">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+              <Button Name="AddItemButton" Content="+ Adicionar item" Click="OnAddItem" Classes="accent" />
+              <Button Name="EditItemButton" Content="Editar" Click="OnEditItem" />
+              <Button Name="RestockItemButton" Content="Repor estoque" Click="OnRestockItem" />
+              <Button Name="DeleteItemButton" Content="Remover" Click="OnDeleteItem" />
+            </StackPanel>
+
+            <ListBox Grid.Row="1" ItemsSource="{Binding Editor.Items}" SelectedItem="{Binding Editor.SelectedItem}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="2*,Auto,Auto,3*" Margin="2">
+                    <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Price, StringFormat='{}{0} Sucata'}" Margin="10,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Stock, StringFormat='Estoque: {0}'}" Margin="10,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding Info}" Opacity="0.7" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </TabItem>
+
+        <!-- FALAS -->
+        <TabItem Header="Falas">
+          <ScrollViewer>
+            <StackPanel Spacing="16" Margin="4">
+
+              <Border Background="#1E1E1E" CornerRadius="6" Padding="12">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Fala de chegada" FontWeight="Bold" FontSize="15" />
+                  <TextBlock Text="Legenda (texto)" />
+                  <TextBox Text="{Binding Editor.ArrivalCaption}" AcceptsReturn="True" Height="50" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Editor.ArrivalAudioLabel}" VerticalAlignment="Center" Opacity="0.8" />
+                    <Button Name="PickArrivalAudioButton" Content="Escolher áudio..." Click="OnPickArrivalAudio" />
+                    <Button Name="ClearArrivalAudioButton" Content="Remover" Click="OnClearArrivalAudio" />
+                    <Button Name="PreviewArrivalAudioButton" Content="▶ Testar" Click="OnPreviewArrivalAudio" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border Background="#1E1E1E" CornerRadius="6" Padding="12">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Fala de venda" FontWeight="Bold" FontSize="15" />
+                  <TextBlock Text="Legenda (texto)" />
+                  <TextBox Text="{Binding Editor.SaleCaption}" AcceptsReturn="True" Height="50" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Editor.SaleAudioLabel}" VerticalAlignment="Center" Opacity="0.8" />
+                    <Button Name="PickSaleAudioButton" Content="Escolher áudio..." Click="OnPickSaleAudio" />
+                    <Button Name="ClearSaleAudioButton" Content="Remover" Click="OnClearSaleAudio" />
+                    <Button Name="PreviewSaleAudioButton" Content="▶ Testar" Click="OnPreviewSaleAudio" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border Background="#1E1E1E" CornerRadius="6" Padding="12">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Fala de saída (despedida)" FontWeight="Bold" FontSize="15" />
+                  <TextBlock Text="Legenda (texto)" />
+                  <TextBox Text="{Binding Editor.ExitCaption}" AcceptsReturn="True" Height="50" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Editor.ExitAudioLabel}" VerticalAlignment="Center" Opacity="0.8" />
+                    <Button Name="PickExitAudioButton" Content="Escolher áudio..." Click="OnPickExitAudio" />
+                    <Button Name="ClearExitAudioButton" Content="Remover" Click="OnClearExitAudio" />
+                    <Button Name="PreviewExitAudioButton" Content="▶ Testar" Click="OnPreviewExitAudio" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <!-- VISUAL -->
+        <TabItem Header="Visual">
+          <Grid ColumnDefinitions="*,320" Margin="4">
+            <Border Grid.Column="0" Margin="0,0,10,0">
+              <vc:VisualEditorControl Name="VisualEditor" />
+            </Border>
+
+            <ScrollViewer Grid.Column="1">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Preset visual" FontWeight="Bold" />
+                <ComboBox ItemsSource="{Binding Editor.Presets}" SelectedItem="{Binding Editor.SelectedPreset}"
+                          HorizontalAlignment="Stretch" DisplayMemberBinding="{Binding Name}" />
+                <WrapPanel>
+                  <Button Name="NewPresetButton" Content="Novo" Click="OnNewPreset" Margin="0,0,4,4" />
+                  <Button Name="EditPresetButton" Content="Editar" Click="OnEditPreset" Margin="0,0,4,4" />
+                  <Button Name="DuplicatePresetButton" Content="Duplicar" Click="OnDuplicatePreset" Margin="0,0,4,4" />
+                  <Button Name="DeletePresetButton" Content="Excluir" Click="OnDeletePreset" Margin="0,0,4,4" />
+                </WrapPanel>
+                <WrapPanel>
+                  <Button Name="ImportPresetButton" Content="Importar preset..." Click="OnImportPreset" Margin="0,0,4,4" />
+                  <Button Name="ExportPresetButton" Content="Exportar preset..." Click="OnExportPreset" Margin="0,0,4,4" />
+                </WrapPanel>
+
+                <Separator Margin="0,6" />
+                <TextBlock Text="Área do vendedor (px na cena 1920x1080)" FontWeight="Bold" />
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="X" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="0" Grid.Column="1" Name="VendorXBox" Minimum="0" Maximum="1920" FormatString="0" ValueChanged="OnVendorRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="Y" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="1" Grid.Column="1" Name="VendorYBox" Minimum="0" Maximum="1080" FormatString="0" ValueChanged="OnVendorRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="Largura" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="2" Grid.Column="1" Name="VendorWBox" Minimum="40" Maximum="1920" FormatString="0" ValueChanged="OnVendorRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="Altura" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="3" Grid.Column="1" Name="VendorHBox" Minimum="40" Maximum="1080" FormatString="0" ValueChanged="OnVendorRegionBoxChanged" Margin="0,0,0,4" />
+                </Grid>
+
+                <TextBlock Text="Área da grade de itens (px na cena 1920x1080)" FontWeight="Bold" Margin="0,8,0,0" />
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="X" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="0" Grid.Column="1" Name="ItemsXBox" Minimum="0" Maximum="1920" FormatString="0" ValueChanged="OnItemsRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="Y" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="1" Grid.Column="1" Name="ItemsYBox" Minimum="0" Maximum="1080" FormatString="0" ValueChanged="OnItemsRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="Largura" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="2" Grid.Column="1" Name="ItemsWBox" Minimum="40" Maximum="1920" FormatString="0" ValueChanged="OnItemsRegionBoxChanged" Margin="0,0,0,4" />
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="Altura" VerticalAlignment="Center" Margin="0,0,6,4" />
+                  <NumericUpDown Grid.Row="3" Grid.Column="1" Name="ItemsHBox" Minimum="40" Maximum="1080" FormatString="0" ValueChanged="OnItemsRegionBoxChanged" Margin="0,0,0,4" />
+                </Grid>
+              </StackPanel>
+            </ScrollViewer>
+          </Grid>
+        </TabItem>
+
+      </TabControl>
+
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+        <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" VerticalAlignment="Center" Opacity="0.8" />
+        <Button Grid.Column="1" Content="Salvar alterações" Command="{Binding Editor.SaveAllCommand}" Classes="accent" />
+      </Grid>
+    </Grid>
+
+    <TextBlock Grid.Column="1" Text="Crie ou selecione uma loja na biblioteca à esquerda para começar."
+               IsVisible="{Binding Editor, Converter={x:Static ObjectConverters.IsNull}}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Opacity="0.6" />
+
+  </Grid>
+</Window>

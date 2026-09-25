@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LojinhaRPG.App.Views.Controls.VisualEditorControl">
+  <Border Background="#1A1A1A" BorderBrush="#444" BorderThickness="1" CornerRadius="4">
+    <Canvas x:Name="EditorCanvas" ClipToBounds="True" Background="Transparent">
+      <Border x:Name="VendorHandle"
+              Background="#665BAF6B" BorderBrush="#8BE28B" BorderThickness="2"
+              Cursor="SizeAll">
+        <Grid>
+          <TextBlock Text="Vendedor" Foreground="White" FontSize="11" Margin="4" />
+          <Border x:Name="VendorGrip" Width="16" Height="16" Background="#8BE28B"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" />
+        </Grid>
+      </Border>
+
+      <Border x:Name="ItemsHandle"
+              Background="#66C99A3E" BorderBrush="#F0B23D" BorderThickness="2"
+              Cursor="SizeAll">
+        <Grid>
+          <TextBlock Text="Itens" Foreground="White" FontSize="11" Margin="4" />
+          <Border x:Name="ItemsGrip" Width="16" Height="16" Background="#F0B23D"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" />
+        </Grid>
+      </Border>
+    </Canvas>
+  </Border>
+</UserControl>

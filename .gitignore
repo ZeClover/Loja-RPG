@@ -1,0 +1,7 @@
+bin/
+obj/
+*.user
+
+# Saída de build local do executável Windows (~90 MB) — não versionada no git.
+# Gere novamente com o comando descrito no README, ou peça o arquivo já compilado.
+publish/

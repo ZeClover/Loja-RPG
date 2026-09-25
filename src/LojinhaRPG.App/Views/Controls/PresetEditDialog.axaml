@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:LojinhaRPG.App.ViewModels"
+        x:Class="LojinhaRPG.App.Views.Controls.PresetEditDialog"
+        x:DataType="vm:PresetEditDialogViewModel"
+        Width="440" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Editar visual (preset)">
+  <ScrollViewer MaxHeight="640">
+    <StackPanel Margin="20" Spacing="8">
+      <TextBlock Text="Nome do preset" />
+      <TextBox Text="{Binding Name}" />
+
+      <TextBlock Text="Descrição" />
+      <TextBox Text="{Binding Description}" />
+
+      <TextBlock Text="Estilo de textura" />
+      <ComboBox ItemsSource="{Binding TextureStyles}" SelectedItem="{Binding SelectedTextureStyle}" HorizontalAlignment="Stretch" />
+
+      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,10,0,0">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Fundo principal (hex)" />
+        <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding PanelBackground}" Margin="0,0,6,8" />
+
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Fundo secundário (hex)" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PanelBackgroundSecondary}" Margin="6,0,0,8" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Cor da borda (hex)" />
+        <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding BorderColor}" Margin="0,0,6,8" />
+
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Cor de destaque (hex)" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding AccentColor}" Margin="6,0,0,8" />
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Cor do texto (hex)" />
+        <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding TextColor}" Margin="0,0,6,8" />
+
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="Fundo do painel de itens (hex)" />
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ItemsPanelBackground}" Margin="6,0,0,8" />
+      </Grid>
+
+      <TextBlock Text="Espessura da borda" />
+      <NumericUpDown Value="{Binding BorderThickness}" Minimum="0" Maximum="40" Increment="1" FormatString="0" />
+
+      <TextBlock Text="Raio dos cantos" />
+      <NumericUpDown Value="{Binding CornerRadius}" Minimum="0" Maximum="60" Increment="1" FormatString="0" />
+
+      <TextBlock Text="{Binding ErrorMessage}" Foreground="IndianRed" TextWrapping="Wrap" />
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,14,0,0">
+        <Button Content="Cancelar" Command="{Binding CancelCommand}" />
+        <Button Content="Salvar" Command="{Binding ConfirmCommand}" Classes="accent" />
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>
